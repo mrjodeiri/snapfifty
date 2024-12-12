@@ -29,9 +29,6 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
-# vercel
-.vercel
-
 # firebase
 .firebase/
 *-debug.log
@@ -39,12 +36,3 @@ yarn-error.log*
 # IDE
 .vscode/
 .idea/
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
