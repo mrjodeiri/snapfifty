@@ -1,0 +1,7 @@
+com\snapfifty\backend\model\Deal.class
+com\snapfifty\backend\service\DealService.class
+com\snapfifty\backend\config\ErrorConfig.class
+com\snapfifty\backend\BackendApplication.class
+com\snapfifty\backend\config\WebConfig.class
+com\snapfifty\backend\controller\HomeController.class
+com\snapfifty\backend\controller\DealController.class

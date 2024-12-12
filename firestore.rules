@@ -1,0 +1,94 @@
+// firestore.rules
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && request.auth.token.admin == true;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Deals collection
+    match /deals/{dealId} {
+      allow read: true;  // Anyone can read deals
+      allow create, update: if isAdmin();
+      allow delete: if isAdmin();
+      
+      // Nested reviews in deals (if using subcollection approach)
+      match /reviews/{reviewId} {
+        allow read: true;
+        allow create: if isAuthenticated();
+        allow update, delete: if isOwner(resource.data.userId) || isAdmin();
+      }
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isAuthenticated() && userId == request.auth.uid;
+      allow update: if isOwner(userId) || isAdmin();
+      allow delete: if isAdmin();
+      
+      // User's saved deals subcollection
+      match /savedDeals/{dealId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+    
+    // Price alerts collection
+    match /price_alerts/{alertId} {
+      allow read: if isOwner(resource.data.userId);
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isOwner(resource.data.userId);
+    }
+    
+    // Reviews collection (if using separate collection)
+    match /reviews/{reviewId} {
+      allow read: true;
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update: if isOwner(resource.data.userId);
+      allow delete: if isOwner(resource.data.userId) || isAdmin();
+    }
+    
+    // User browsing history
+    match /browsing_history/{historyId} {
+      allow read: if isOwner(resource.data.userId);
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow delete: if isOwner(resource.data.userId);
+    }
+    
+    // Price history collection
+    match /price_history/{historyId} {
+      allow read: true;
+      allow write: if isAdmin();
+    }
+    
+    // Deal trends collection
+    match /deal_trends/{trendId} {
+      allow read: true;
+      allow write: if isAdmin();
+    }
+    
+    // User notifications
+    match /notifications/{notificationId} {
+      allow read: if isOwner(resource.data.userId);
+      allow create: if isAdmin();
+      allow update: if isOwner(resource.data.userId) || isAdmin();
+      allow delete: if isOwner(resource.data.userId) || isAdmin();
+    }
+    
+    // User preferences
+    match /user_preferences/{userId} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId);
+    }
+  }
+}

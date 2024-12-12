@@ -1,0 +1,147 @@
+// package.json
+{
+  "name": "snapfifty-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@radix-ui/react-alert-dialog": "^1.0.5",
+    "@radix-ui/react-dialog": "^1.0.5",
+    "@radix-ui/react-slot": "^1.0.2",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.0.0",
+    "firebase": "^10.7.1",
+    "lucide-react": "^0.263.1",
+    "next": "14.0.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "recharts": "^2.10.3",
+    "tailwind-merge": "^2.1.0",
+    "tailwindcss-animate": "^1.0.7"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  }
+}
+
+// src/lib/firebase.js
+import { initializeApp } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore';
+
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
+};
+
+const app = initializeApp(firebaseConfig);
+export const db = getFirestore(app);
+
+// src/hooks/usePriceAnalysis.js
+import { useState, useEffect } from 'react';
+import { db } from '@/lib/firebase';
+import { collection, query, where, onSnapshot, doc } from 'firebase/firestore';
+
+export const usePriceAnalysis = (dealId) => {
+  const [priceHistory, setPriceHistory] = useState([]);
+  const [prediction, setPrediction] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!dealId) return;
+
+    const historyRef = collection(db, 'price_history');
+    const predictionRef = doc(db, 'price_predictions', dealId);
+
+    const historyQuery = query(historyRef, where('dealId', '==', dealId));
+
+    const unsubHistory = onSnapshot(historyQuery, (snapshot) => {
+      const history = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        timestamp: doc.data().timestamp.toDate()
+      }));
+      setPriceHistory(history);
+    }, (err) => setError(err));
+
+    const unsubPrediction = onSnapshot(predictionRef, (doc) => {
+      if (doc.exists()) {
+        setPrediction({
+          ...doc.data(),
+          predictionDate: doc.data().predictionDate.toDate()
+        });
+      }
+      setLoading(false);
+    }, (err) => setError(err));
+
+    return () => {
+      unsubHistory();
+      unsubPrediction();
+    };
+  }, [dealId]);
+
+  return { priceHistory, prediction, loading, error };
+};
+
+// src/components/deals/PriceTrendCard.jsx
+import React from 'react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { ArrowUpCircle, ArrowDownCircle, MinusCircle, AlertTriangle } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+
+[Previous PriceTrendCard code remains exactly the same]
+
+// src/components/deals/DealCard.jsx
+[Previous DealCard code remains exactly the same]
+
+// src/pages/index.js
+import { useState, useEffect } from 'react';
+import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import DealCard from '@/components/deals/DealCard';
+
+export default function Home() {
+  const [deals, setDeals] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const dealsRef = collection(db, 'deals');
+    const dealsQuery = query(dealsRef, orderBy('createdAt', 'desc'));
+
+    const unsubscribe = onSnapshot(dealsQuery, (snapshot) => {
+      const dealsData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setDeals(dealsData);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  if (loading) return <div>Loading...</div>;
+
+  return (
+    <main className="container mx-auto px-4 py-8">
+      <h1 className="text-4xl font-bold mb-8">Today's Best Deals</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {deals.map(deal => (
+          <DealCard key={deal.id} deal={deal} />
+        ))}
+      </div>
+    </main>
+  );
+}
+
+// Next steps:
+// 1. Create src/pages/deals/[id].js for individual deal pages
+// 2. Implement the notification system
+// 3. Add deal recommendations
+// 4. Build the price comparison feature
