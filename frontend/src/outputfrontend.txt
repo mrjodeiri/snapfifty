@@ -1,0 +1,109 @@
+Folder PATH listing
+Volume serial number is 4CE3-F76D
+D:.
+|   App.css
+|   App.js
+|   App.test.js
+|   Homepage.js
+|   index.css
+|   index.css.txt
+|   index.js
+|   logo.svg
+|   outputfrontend.txt
+|   reportWebVitals.js
+|   setupTests.js
+|   
++---components
+|   |   BlogDetail.js
+|   |   BlogList.js
+|   |   HomeContent.js
+|   |   HomePage.js
+|   |   RelatedBlogs.js
+|   |   
+|   +---admin
+|   |   |   ActivityLogs.js
+|   |   |   AdminLayout.js
+|   |   |   AnalyticsDashboard.js
+|   |   |   BlogEditor.js
+|   |   |   BlogManager.js
+|   |   |   Dashboard.js
+|   |   |   Navigation.js
+|   |   |   Settings.js
+|   |   |   UserManagement.js
+|   |   |   UserModal.js
+|   |   |   
+|   |   \---deals
+|   |           DealManagement.js
+|   |           DealModal.js
+|   |           DealPreviewModal.js
+|   |           DealStats.js
+|   |           
+|   +---common
+|   |       LoadingButton.js
+|   |       SEOHead.js
+|   |       
+|   +---layout
+|   |       Navbar.jsx
+|   |       
+|   +---notifications
+|   |       PriceAlertDialog.jsx
+|   |       
+|   +---price
+|   |       DealCard.jsx
+|   |       PriceTrendCard.jsx
+|   |       
+|   +---reviews
+|   |       RatingInput.jsx
+|   |       
+|   \---user
+|           PreferencesCard.jsx
+|           ProfileCard.jsx
+|           SavedDeals.jsx
+|           
++---config
+|       firebase.js
+|       
++---contexts
+|       AuthContext.js
+|       
++---hooks
+|       useActivityLogger.js
+|       useActivityTracking.js
+|       useAnalytics.js
+|       useAuth.js
+|       useFirestore.js
+|       usePriceAnalysis.js
+|       useRecommendations.js
+|       useUserProfile.js
+|       
++---lib
+|   |   firebase.js
+|   |   recommendation.js
+|   |   
+|   \---firebase
+|           userService.js
+|           
++---pages
+|   |   dashboard.js
+|   |   
+|   \---deals
+|           [id].js
+|           
+\---utils
+        aiModeration.js
+        aiRecommendation.js
+        dealAI.js
+        dealAnalytics.js
+        dealAutomation.js
+        dealExport.js
+        dealImport.js
+        dealMonitoring.js
+        dealNotifications.js
+        dealRecommendation.js
+        dealReporting.js
+        dealSearch.js
+        dealTemplates.js
+        dealValidation.js
+        userAuth.js
+        userPreferences.js
+        

@@ -1,17 +1,18 @@
-// src/pages/deals/[id].js
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { RatingInput, ReviewForm, ReviewList, DealRating } from '@/components/reviews';
-import DealCard from '@/components/deals/DealCard';
-import { useAuth } from '@/hooks/useAuth';
+import DealCard from '@/components/price/DealCard';
 
 export default function DealPage() {
   const router = useRouter();
   const { id } = router.query;
-  const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('details');
+
+  // Add this to handle SSG
+  if (!id) {
+    return null;
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -20,7 +21,7 @@ export default function DealPage() {
           <DealCard id={id} />
           
           <Card className="mt-8">
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <Tabs defaultValue="details">
               <TabsList>
                 <TabsTrigger value="details">Details</TabsTrigger>
                 <TabsTrigger value="reviews">Reviews</TabsTrigger>
@@ -35,23 +36,28 @@ export default function DealPage() {
               <TabsContent value="reviews">
                 <CardContent className="space-y-6">
                   <DealRating dealId={id} />
-                  
-                  {user && <ReviewForm dealId={id} />}
-                  
-                  <div className="mt-8">
-                    <h3 className="text-lg font-semibold mb-4">Customer Reviews</h3>
-                    <ReviewList dealId={id} />
-                  </div>
+                  <ReviewForm dealId={id} />
+                  <ReviewList dealId={id} />
                 </CardContent>
               </TabsContent>
             </Tabs>
           </Card>
         </div>
-
-        <div>
-          {/* Similar deals section */}
-        </div>
       </div>
     </div>
   );
+}
+
+// Add this for static generation
+export async function getStaticPaths() {
+  return {
+    paths: [],
+    fallback: true
+  };
+}
+
+export async function getStaticProps() {
+  return {
+    props: {}
+  };
 }

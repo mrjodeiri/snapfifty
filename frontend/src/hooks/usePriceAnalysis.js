@@ -1,5 +1,6 @@
-// hooks/usePriceAnalysis.js
 import { useState, useEffect } from 'react';
+import { db } from '@/lib/firebase';
+import { collection, query, where, onSnapshot, doc } from 'firebase/firestore';
 
 export const usePriceAnalysis = (dealId) => {
   const [priceHistory, setPriceHistory] = useState([]);
@@ -8,54 +9,47 @@ export const usePriceAnalysis = (dealId) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchPriceData = async () => {
-      try {
-        setLoading(true);
-        
-        // Fetch price history
-        const historyResponse = await fetch(`/api/price-analysis/${dealId}/history`);
-        if (!historyResponse.ok) throw new Error('Failed to fetch price history');
-        const historyData = await historyResponse.json();
-        
-        // Fetch prediction
-        const predictionResponse = await fetch(`/api/price-analysis/${dealId}/prediction`);
-        if (!predictionResponse.ok) throw new Error('Failed to fetch prediction');
-        const predictionData = await predictionResponse.json();
+    if (!dealId) {
+      setLoading(false);
+      return;
+    }
 
-        setPriceHistory(historyData);
-        setPrediction(predictionData);
-      } catch (err) {
-        setError(err.message);
-      } finally {
+    try {
+      const historyRef = collection(db, 'price_history');
+      const predictionRef = doc(db, 'price_predictions', dealId);
+
+      const historyQuery = query(historyRef, where('dealId', '==', dealId));
+
+      const unsubHistory = onSnapshot(historyQuery, (snapshot) => {
+        const history = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          timestamp: doc.data().timestamp?.toDate() || new Date()
+        }));
+        setPriceHistory(history);
+      }, (err) => setError(err));
+
+      const unsubPrediction = onSnapshot(predictionRef, (doc) => {
+        if (doc.exists()) {
+          setPrediction({
+            ...doc.data(),
+            predictionDate: doc.data().predictionDate?.toDate() || new Date()
+          });
+        }
         setLoading(false);
-      }
-    };
+      }, (err) => setError(err));
 
-    if (dealId) {
-      fetchPriceData();
+      return () => {
+        unsubHistory();
+        unsubPrediction();
+      };
+    } catch (err) {
+      setError(err);
+      setLoading(false);
     }
   }, [dealId]);
 
-  const updatePrediction = async () => {
-    try {
-      const response = await fetch(`/api/price-analysis/${dealId}/update-prediction`, {
-        method: 'POST'
-      });
-      if (!response.ok) throw new Error('Failed to update prediction');
-      const newPrediction = await response.json();
-      setPrediction(newPrediction);
-      return newPrediction;
-    } catch (err) {
-      setError(err.message);
-      throw err;
-    }
-  };
-
-  return {
-    priceHistory,
-    prediction,
-    loading,
-    error,
-    updatePrediction
-  };
+  return { priceHistory, prediction, loading, error };
 };
+
+export default usePriceAnalysis;

@@ -1,7 +1,7 @@
 // src/components/user/SavedDeals.jsx
 import React from 'react';
 import { useSavedDeals } from '@/hooks/useSavedDeals';
-import DealCard from '@/components/deals/DealCard';
+import DealCard from '../price/DealCard';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { BookmarkX } from 'lucide-react';

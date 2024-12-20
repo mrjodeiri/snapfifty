@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
+import PriceAlertDialog from '@/components/notifications/PriceAlertDialog';
+import { Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ArrowUpCircle, ArrowDownCircle, MinusCircle, TrendingUp } from 'lucide-react';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
-import PriceTrendCard from './PriceTrendCard';
-import { usePriceAnalysis } from '../hooks/usePriceAnalysis';
-
+import { usePriceAnalysis } from '@/hooks/usePriceAnalysis';
 const DealCard = ({ deal }) => {
   const { prediction, loading } = usePriceAnalysis(deal.id);
   const [showTrendModal, setShowTrendModal] = useState(false);
