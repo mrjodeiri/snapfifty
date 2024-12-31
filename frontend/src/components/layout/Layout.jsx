@@ -1,9 +1,13 @@
 import React from 'react';
+import Navbar from './Navbar';
 
-export default function Layout({ children }) {
+const Layout = ({ children }) => {
   return (
     <div className="min-h-screen bg-background">
-      {children}
+      <Navbar />
+      <main>{children}</main>
     </div>
   );
-}
+};
+
+export default Layout;

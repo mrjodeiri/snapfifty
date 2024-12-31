@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { db } from '@/lib/firebase';
-import { collection, query, where, orderBy, onSnapshot, doc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { useAuth } from './useAuth';
+import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
+import { useAuth } from '@/hooks/useAuth';
 
 export const useNotifications = () => {
   const [notifications, setNotifications] = useState([]);
@@ -29,16 +29,26 @@ export const useNotifications = () => {
   }, [user]);
 
   const markAsRead = async (notificationId) => {
-    if (!user) return;
-    const notificationRef = doc(db, 'notifications', notificationId);
-    await updateDoc(notificationRef, { read: true });
+    try {
+      await db.collection('notifications').doc(notificationId).update({
+        read: true
+      });
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+    }
   };
 
   const clearNotification = async (notificationId) => {
-    if (!user) return;
-    const notificationRef = doc(db, 'notifications', notificationId);
-    await deleteDoc(notificationRef);
+    try {
+      await db.collection('notifications').doc(notificationId).delete();
+    } catch (error) {
+      console.error('Error clearing notification:', error);
+    }
   };
 
-  return { notifications, markAsRead, clearNotification };
+  return {
+    notifications,
+    markAsRead,
+    clearNotification
+  };
 };
