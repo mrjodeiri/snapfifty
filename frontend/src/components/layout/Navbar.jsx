@@ -16,7 +16,6 @@ const Navbar = () => {
           <Link href="/" className="text-xl font-bold">
             SnapFifty
           </Link>
-
           <div className="flex items-center space-x-4">
             {user && (
               <Popover>

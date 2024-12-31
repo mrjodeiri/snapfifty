@@ -1,1 +1,1 @@
-{"/_error":"pages/_error.js","/dashboard":"pages/dashboard.html","/_app":"pages/_app.js","/404":"pages/404.html","/":"pages/index.html","/deals/[id]":"pages/deals/[id].js","/_document":"pages/_document.js"}
+{"/_app":"pages/_app.js","/_error":"pages/_error.js","/404":"pages/404.html","/dashboard":"pages/dashboard.html","/":"pages/index.html","/deals/[id]":"pages/deals/[id].js","/_document":"pages/_document.js"}
